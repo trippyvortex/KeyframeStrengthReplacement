@@ -1,0 +1,30 @@
+import re
+from IPython.display import display, HTML
+
+keyframe_data = ""#@param {type:"string"}
+
+# Step 1: Split the keyframe data into individual pairs of frame numbers and strength values
+pattern = r"(\d+):\((\d+\.\d+)\)"
+keyframe_pairs = re.findall(pattern, keyframe_data)
+
+# Step 2: Iterate through the pairs of frame numbers and strength values in groups of 64
+modified_pairs = []
+for i in range(0, len(keyframe_pairs), 120):
+    group = keyframe_pairs[i:i+120]
+
+    # Step 3: Within each group, find the lowest strength value
+    lowest_strength = min(float(pair[1]) for pair in group)
+
+    # Step 4: Replace the lowest strength value with 0.5
+    modified_group = [(pair[0], "0.50" )  if float(pair[1]) == lowest_strength else pair for pair in group]
+
+    modified_pairs.extend(modified_group)
+
+
+
+# Step 5: Generate the modified keyframe data string
+modified_keyframe_data = ", ".join([f"{frame}:({strength})" for frame, strength in modified_pairs])
+
+# Display the modified keyframe data with a button for copying the output
+button_html = f'<button onclick="navigator.clipboard.writeText(\'{modified_keyframe_data}\')">Copy Output</button>'
+display(HTML(modified_keyframe_data + button_html))
